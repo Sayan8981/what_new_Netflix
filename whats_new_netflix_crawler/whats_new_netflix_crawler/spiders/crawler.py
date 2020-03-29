@@ -35,8 +35,7 @@ class whatsnewnetflixbrowse(Spider):
         self.content_show_type=''
         self.content_tv_rating=''
         self.content_description=''
-        self.content_imdb_rating=''
-        self.content_imdb_rating=''
+        self.content_rating=''
         self.others_info_dict=dict()
 
     @classmethod
@@ -68,8 +67,7 @@ class whatsnewnetflixbrowse(Spider):
         self.content_show_type=''
         self.content_tv_rating=''
         self.content_description=''
-        self.content_imdb_rating=''
-        self.content_imdb_rating=''
+        self.content_rating=''
         self.others_info_dict=dict() 
 
     def parse(self,response):
@@ -110,12 +108,12 @@ class whatsnewnetflixbrowse(Spider):
             self.content_title=unidecode.unidecode(pinyin.get(title)).strip(' ')
             title=title.replace('\"','\'')
             self.content_img=sel.xpath(xpath.img_xpath%title).extract_first()
-            self.content_imdb_rating=sel.xpath(xpath.imdb_rating_xpath%title).extract() 
-            self.content_imdb_rating=tuple(filter(lambda rating: rating!='\n', self.content_imdb_rating))
-            if self.content_imdb_rating:
-                self.content_imdb_rating=self.content_imdb_rating[0].strip(' ')
+            self.content_rating=sel.xpath(xpath.rating_xpath%title).extract() 
+            self.content_rating=tuple(filter(lambda rating: rating!='\n', self.content_rating))
+            if self.content_rating:
+                self.content_rating=self.content_rating[0].strip(' ')
             else:
-                self.content_imdb_rating=''   
+                self.content_rating=''   
             self.content_url=sel.xpath(xpath.url_xpath%title).extract_first()     
             self.content_id=self.content_url.split('netflixid=')[-1:][0]
             self.content_type=sel.xpath(xpath.content_type_xpath%title).extract_first()
@@ -136,15 +134,15 @@ class whatsnewnetflixbrowse(Spider):
                 for tags in self.others_info_tags:
                     self.others_info_dict[tags.strip(': ')]=sel.xpath(xpath.info_xpath%(title,tags)).get().strip(' ')
             print("\n")
-            print({"content_title":self.content_title,"content_img_url":self.content_img,"content_imdb_rating":self.content_imdb_rating,"content_url":self.content_url,"content_id":self.content_id,"content_type":self.content_type,"content_show_type":self.content_show_type,"season_number":self.season_number,"year":self.year,"content_tv_rating":self.content_tv_rating,"content_description":self.content_description,"others_info":self.others_info_dict,"page_url":response.url})
-            yield Request(url=response.url,meta={'item_category':response.meta['item_category'],"content_title":self.content_title,"content_img_url":self.content_img,"content_imdb_rating":self.content_imdb_rating,"content_url":self.content_url,"content_id":self.content_id,"content_type":self.content_type,"content_show_type":self.content_show_type,"season_number":self.season_number,"year":self.year,"content_tv_rating":self.content_tv_rating,"content_description":self.content_description,"others_info":self.others_info_dict,"page_url":response.url},callback=self.item_stored,dont_filter=True)
+            print({"content_title":self.content_title,"content_img_url":self.content_img,"content_imdb_rating":self.content_rating,"content_url":self.content_url,"content_id":self.content_id,"content_type":self.content_type,"content_show_type":self.content_show_type,"season_number":self.season_number,"year":self.year,"content_tv_rating":self.content_tv_rating,"content_description":self.content_description,"others_info":self.others_info_dict,"page_url":response.url})
+            yield Request(url=response.url,meta={'item_category':response.meta['item_category'],"content_title":self.content_title,"content_img_url":self.content_img,"content_rating":self.content_rating,"content_url":self.content_url,"content_id":self.content_id,"content_type":self.content_type,"content_show_type":self.content_show_type,"season_number":self.season_number,"year":self.year,"content_tv_rating":self.content_tv_rating,"content_description":self.content_description,"others_info":self.others_info_dict,"page_url":response.url},callback=self.item_stored,dont_filter=True)
 
     def item_stored(self,response): 
         item=WhatsNewNetflixCrawlerItem()
         item["netflix_id"]=response.meta["content_id"]
         item["title"]=response.meta["content_title"]
         item["image"]=response.meta["content_img_url"]
-        item["imdb_rating"]=response.meta["content_imdb_rating"]
+        item["rating"]=response.meta["content_rating"]
         item["url"]=response.meta["content_url"]
         item["content_type"]=response.meta["content_type"]
         item["show_type"]=response.meta["content_show_type"]

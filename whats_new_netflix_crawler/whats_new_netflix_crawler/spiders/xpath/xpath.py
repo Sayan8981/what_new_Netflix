@@ -3,7 +3,7 @@
 
 title_xpath='//div[@class="new-title-right"]/h5/text()'
 img_xpath='//div[h5[contains(text(),"%s")]]/preceding-sibling::div[@class="new-title-left"]/img/@data-src'
-imdb_rating_xpath='//div[h5[contains(text(),"%s")]]/preceding-sibling::div[@class="new-title-left"]/div[@class="new-title-ratings"]/text()'
+rating_xpath='//div[h5[contains(text(),"%s")]]/preceding-sibling::div[@class="new-title-left"]/div[@class="new-title-ratings"]/text()'
 url_xpath='//div[h5[contains(text(),"%s")]]/preceding-sibling::div[@class="new-title-left"]/div[@class="title-buttons"]/a/@href'
 content_type_xpath='//div[h5[contains(text(),"%s")]]/preceding-sibling::div[@class="new-title-left"]/div[@class="netflix-original-banner"]/text()'
 show_type_xpath='//div[h5[contains(text(),"%s")]]/img/@title'

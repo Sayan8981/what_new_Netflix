@@ -14,7 +14,7 @@ class WhatsNewNetflixCrawlerItem(scrapy.Item):
     netflix_id=scrapy.Field()
     title=scrapy.Field()
     image=scrapy.Field()
-    imdb_rating=scrapy.Field()
+    rating=scrapy.Field()
     url=scrapy.Field()
     content_type=scrapy.Field()
     show_type=scrapy.Field()
