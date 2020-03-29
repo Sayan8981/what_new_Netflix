@@ -19,8 +19,8 @@ class WhatsNewNetflixCrawlerPipeline(object):
 
    def process_item(self, item, spider):
         #import pdb;pdb.set_trace()  
-        self.query="insert into netflix (netflix_id,title,image,rating,url,content_type,show_type,season_number,year,tv_rating,description,genre,cast,director,duration,language,updated_db,item_category) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-        self.cursor.execute(self.query,(item["netflix_id"],item["title"],item["image"],item["rating"],item["url"],item["content_type"],item["show_type"],item["season_number"],item["year"],item["tv_rating"],item["description"],item["genre"],item["cast"],item["director"],item["runtime"],item["language"],item["updated_db"],item["item_category"]))
+        self.query="insert into netflix (netflix_id,title,image,rating,url,content_type,show_type,season_number,year,tv_rating,description,genre,cast,director,duration,language,Awards,updated_db,item_category) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+        self.cursor.execute(self.query,(item["netflix_id"],item["title"],item["image"],item["rating"],item["url"],item["content_type"],item["show_type"],item["season_number"],item["year"],item["tv_rating"],item["description"],item["genre"],item["cast"],item["director"],item["runtime"],item["language"],item["Awards"],item["updated_db"],item["item_category"]))
         self.counter+=1
         self.connection.autocommit(True)
         print("\n")

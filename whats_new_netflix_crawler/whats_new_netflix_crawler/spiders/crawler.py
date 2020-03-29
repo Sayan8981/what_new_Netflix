@@ -2,7 +2,7 @@ import scrapy
 from scrapy import *
 import sys
 import os
-import time
+import time,re
 import pinyin,unidecode
 from scrapy import signals
 from datetime import datetime,timedelta
@@ -104,40 +104,50 @@ class whatsnewnetflixbrowse(Spider):
         extract_titles=sel.xpath(xpath.title_xpath).extract()
         #TODO: Iterate through title to get the mata data for particular title 
         for title in extract_titles:
-            self.cleanup()
-            self.content_title=unidecode.unidecode(pinyin.get(title)).strip(' ')
-            title=title.replace('\"','\'')
-            self.content_img=sel.xpath(xpath.img_xpath%title).extract_first()
-            self.content_rating=sel.xpath(xpath.rating_xpath%title).extract() 
-            self.content_rating=tuple(filter(lambda rating: rating!='\n', self.content_rating))
-            if self.content_rating:
-                self.content_rating=self.content_rating[0].strip(' ')
-            else:
-                self.content_rating=''   
-            self.content_url=sel.xpath(xpath.url_xpath%title).extract_first()     
-            self.content_id=self.content_url.split('netflixid=')[-1:][0]
-            self.content_type=sel.xpath(xpath.content_type_xpath%title).extract_first()
-            self.content_show_type=sel.xpath(xpath.show_type_xpath%title).extract_first()
-            if self.content_show_type=='TV Series':
-                self.season_number=sel.xpath(xpath.season_number_xpath%title).extract_first().strip(' ()')    
-            else:
-                self.year=sel.xpath(xpath.year_xpath%title).extract_first().strip(' ()')
-            self.content_tv_rating= sel.xpath(xpath.tv_rating_xpath%title).extract()     
-            self.content_tv_rating=tuple(filter(lambda rating: rating!='\n' ,self.content_tv_rating))
-            if self.content_tv_rating:
-                self.content_tv_rating=self.content_tv_rating[0].replace('\n','').strip(' ')
-            else:
-                self.content_tv_rating=''    
-            self.content_description=unidecode.unidecode(pinyin.get(sel.xpath(xpath.description_xpath%title).extract_first())).strip('\n')    
-            self.others_info_tags=sel.xpath(xpath.other_info_xpath%title).extract() 
-            if self.others_info_tags:
-                for tags in self.others_info_tags:
-                    self.others_info_dict[tags.strip(': ')]=sel.xpath(xpath.info_xpath%(title,tags)).get().strip(' ')
-            print("\n")
-            print({"content_title":self.content_title,"content_img_url":self.content_img,"content_imdb_rating":self.content_rating,"content_url":self.content_url,"content_id":self.content_id,"content_type":self.content_type,"content_show_type":self.content_show_type,"season_number":self.season_number,"year":self.year,"content_tv_rating":self.content_tv_rating,"content_description":self.content_description,"others_info":self.others_info_dict,"page_url":response.url})
-            yield Request(url=response.url,meta={'item_category':response.meta['item_category'],"content_title":self.content_title,"content_img_url":self.content_img,"content_rating":self.content_rating,"content_url":self.content_url,"content_id":self.content_id,"content_type":self.content_type,"content_show_type":self.content_show_type,"season_number":self.season_number,"year":self.year,"content_tv_rating":self.content_tv_rating,"content_description":self.content_description,"others_info":self.others_info_dict,"page_url":response.url},callback=self.item_stored,dont_filter=True)
+            try:
+                self.cleanup()
+                #import pdb;pdb.set_trace()
+                self.content_title=unidecode.unidecode(pinyin.get(title)).strip(' ')
+                title=pinyin.get(title.replace('\"','\''))
+                title=re.sub(re.compile("'.*'?"),"",title).strip(' ')
+                self.content_img=sel.xpath(xpath.img_xpath%title).extract_first()
+                self.content_rating=sel.xpath(xpath.rating_xpath%title).extract() 
+                self.content_rating=tuple(filter(lambda rating: rating!='\n', self.content_rating))
+                if self.content_rating:
+                    self.content_rating=self.content_rating[0].strip(' ')
+                else:
+                    self.content_rating=''   
+                self.content_url=sel.xpath(xpath.url_xpath%title).extract_first()     
+                self.content_id=self.content_url.split('netflixid=')[-1:][0].strip('-')
+                self.content_type=sel.xpath(xpath.content_type_xpath%title).extract_first()
+                self.content_show_type=sel.xpath(xpath.show_type_xpath%title).extract_first()
+                if self.content_show_type=='TV Series':
+                    self.season_number=sel.xpath(xpath.season_number_xpath%title).extract_first().strip(' ()')    
+                else:
+                    self.year=sel.xpath(xpath.year_xpath%title).extract_first().strip(' ()')
+                self.content_tv_rating= sel.xpath(xpath.tv_rating_xpath%title).extract()     
+                self.content_tv_rating=tuple(filter(lambda rating: rating!='\n' ,self.content_tv_rating))
+                if self.content_tv_rating:
+                    self.content_tv_rating=self.content_tv_rating[0].replace('\n','').strip(' ')
+                else:
+                    self.content_tv_rating=''   
+                try:     
+                    self.content_description=unidecode.unidecode(pinyin.get(sel.xpath(xpath.description_xpath%title).extract_first())).strip('\n')    
+                except Exception:
+                    self.content_description=''    
+                self.others_info_tags=sel.xpath(xpath.other_info_xpath%title).extract() 
+                if self.others_info_tags:
+                    for tags in self.others_info_tags:
+                        self.others_info_dict[tags.strip(': ')]=sel.xpath(xpath.info_xpath%(title,tags)).get().strip(' ').strip('\t').strip('.')
+                print("\n")
+                print({"content_title":self.content_title,"content_img_url":self.content_img,"content_rating":self.content_rating,"content_url":self.content_url,"content_id":self.content_id,"content_type":self.content_type,"content_show_type":self.content_show_type,"season_number":self.season_number,"year":self.year,"content_tv_rating":self.content_tv_rating,"content_description":self.content_description,"others_info":self.others_info_dict,"page_url":response.url})
+                #import pdb;pdb.set_trace()
+                yield Request(url=response.url,meta={'item_category':response.meta['item_category'],"content_title":self.content_title,"content_img_url":self.content_img,"content_rating":self.content_rating,"content_url":self.content_url,"content_id":self.content_id,"content_type":self.content_type,"content_show_type":self.content_show_type,"season_number":self.season_number,"year":self.year,"content_tv_rating":self.content_tv_rating,"content_description":self.content_description,"others_info":self.others_info_dict,"page_url":response.url},callback=self.item_stored,dont_filter=True)
+            except Exception:
+                 print ("Got exception:",title,response.url)    
 
     def item_stored(self,response): 
+        #import pdb;pdb.set_trace()
         item=WhatsNewNetflixCrawlerItem()
         item["netflix_id"]=response.meta["content_id"]
         item["title"]=response.meta["content_title"]
@@ -170,6 +180,10 @@ class whatsnewnetflixbrowse(Spider):
             item["language"]=str(response.meta["others_info"]["Language"])
         except Exception:
             item["language"]=''
+        try:    
+            item["Awards"]=  str(response.meta["others_info"]["Awards"])  
+        except Exception:
+            item["Awards"]=''    
         item["updated_db"]=datetime.now().strftime('%b %d, %Y')
         item["item_category"]=response.meta["item_category"]
         return item

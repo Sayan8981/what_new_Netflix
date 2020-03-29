@@ -18,8 +18,8 @@ class send_emails:
 
     def user_input(self):
         self.sender_email="saayan@headrun.com"
-        self.receiver_email=["saayan8981@gmail.com"]
-        self.cc=["saayan9045@yahoo.com","saayan@headrun.com"]
+        self.receiver_email=["jyoshna@headrun.com"]
+        self.cc=["saayan@headrun.com"]
         #self.bcc=["**********"]
         self.password="9891274567"
 

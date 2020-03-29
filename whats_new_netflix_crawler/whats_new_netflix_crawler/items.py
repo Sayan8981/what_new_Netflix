@@ -27,6 +27,7 @@ class WhatsNewNetflixCrawlerItem(scrapy.Item):
     director=scrapy.Field()
     runtime=scrapy.Field()
     language=scrapy.Field()
+    Awards=scrapy.Field()
     updated_db=scrapy.Field()
     item_category=scrapy.Field()
 

@@ -12,7 +12,7 @@ class db_output_stats:
         self.db_list=[]
         self.connection=''
         self.cursor=''
-        self.fieldnames=["netflix_id","title","image","rating","url","content_type","show_type","season_number","year","tv_rating","description","genre","cast","director","duration","language","updated_db","item_category"]
+        self.fieldnames=["netflix_id","title","image","rating","url","content_type","show_type","season_number","year","tv_rating","description","genre","cast","director","duration","language","Awards","updated_db","item_category"]
 
     def set_up_db_connection(self):
         self.connection=MySQLdb.connect(host=db_detail.IP_addr,user="%s"%db_detail.username,passwd="%s"%db_detail.passwd,db=db_detail.database_name)
@@ -33,7 +33,7 @@ class db_output_stats:
         with output_file as outputcsvfile:
             self.writer= csv.writer(outputcsvfile,dialect="csv",lineterminator = '\n')
             self.writer.writerow(self.fieldnames)
-            query="select netflix_id,title,image,rating,url,content_type,show_type,season_number,year,tv_rating,description,genre,cast,director,duration,language,updated_db,item_category from netflix"
+            query="select netflix_id,title,image,rating,url,content_type,show_type,season_number,year,tv_rating,description,genre,cast,director,duration,language,Awards,updated_db,item_category from netflix"
             self.cursor.execute(query)
             result=self.cursor.fetchall()
             self.writer.writerows(result)
